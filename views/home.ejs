@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>VideoChat</title>
+	<!--<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js" defer></script>
+	<script src="/socket.io/socket.io.js" defer></script>-->
+	<script src="client.js" defer></script>
+	<script src="https://kit.fontawesome.com/9686dd8fc9.js" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
+	<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/9686dd8fc9.js" crossorigin="anonymous"></script>
+
+
+	<style type="text/css">
+		body {
+			margin-top: 9px;
+		}
+		#body_text {
+			font-size: 40px;
+		}
+		#front {
+			width: 650px;
+			margin-top: 100px;
+			margin-left: 100px;
+		}
+		a {
+			text-decoration: none;
+			color : black;
+		}
+		button {
+			margin-right: 10px;
+		}
+
+		#image_gif {
+			width: 600px;
+			height: 600px;
+
+		}
+
+		#link {
+			width: 370px;
+		}
+
+		#join_link {
+			display: none;
+			margin-top: 50px;
+		}
+
+		#newLink {
+			width: 91%;
+		}
+		#signup-head {
+			float: left;
+		    padding: 10px;
+		    text-align: center;
+		    width: 50%;
+		}
+
+		#signin-head {
+			border-left: 1px solid black;
+		    padding: 12px;
+		    width: 50%;
+		    text-align: center;
+		}
+		#signin-container {
+			display: none;
+		}
+		.fabutton {
+			border:none;
+			background: none;
+			padding: 0;
+			margin-left: 10px;
+		}
+		.btn-lg
+		{
+			font-size: 1.11rem;
+		}
+
+	</style>
+<body>
+<div class="container-fluid">
+<div class="row">
+	<div class="col-6">
+		<h3><i class="fas fa-video"></i> VideoChat</h3>
+	</div>
+	<div class="col-6" id="check" style="text-align: right;margin-top: 10px">
+		<button class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter1" onclick="signup()">Sign up</button>
+		<button class="btn btn-success" data-toggle="modal" data-target="#exampleModalCenter1" onclick="signin()">Sign in</button>
+	</div>
+	<div class="col-6" id="profile" style="text-align: right;margin-top: 5px;display: none;padding-right: 40px">
+		<span style="font-size: 22px"><i class="fas fa-user-circle" style="margin-right: 5px;"></i><%= userName %></span>
+		<a href="/logout" style = "margin-left:10px" class="btn btn-dark"><i class="fas fa-sign-out-alt"></i> Logout</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-6" id="front">
+		<p id="body_text">Enjoy high quaility free video calling and uninterrupted services</p>
+		<br>
+		<p style="color: grey;font-size: 23px">We make this service for secure, smooth video <br>conferencing experinece at free of cost for everyone.</p>
+		<br><br>
+		<button id="create" class="btn btn-info btn-lg"  data-toggle="modal" onclick="create()"><i class="fas fa-plus"></i> Create Meeting</button> 
+		<button id="join" class="btn btn-dark btn-lg" onclick="add()"><i class="fas fa-user-plus"></i> Join Meeting</button>
+		
+	   <div id="join_link">
+			<form action="/" method="post" class="row g-3">
+				<p style="color:grey">* Enter your meeting url and enjoy services </p>
+				<div class="col-auto"><input type="text" name="link" id="link" placeholder="Enter url" class="form-control" required></div> 
+
+				<div class="col-auto"><button type="submit" class="btn btn-outline-primary">Join</button></div>
+
+			</form>
+	   </div>
+
+	   <!-- link in modal -->
+
+	   <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			  <div class="modal-dialog modal-dialog-centered" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="exampleModalLongTitle">New meeting link</h5>
+			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			      </div>
+			      <div class="modal-body">
+			           <input type="text" id="newLink" readonly>
+   	   					<button onclick = "copy()" class="fabutton" onmouseout="outFunc()">
+   	   						<i class="fas fa-copy"></i>
+   	   					</button>
+	   	   				
+			      </div>
+			    </div>
+			   </div>
+		</div>
+
+
+		<div class="modal fade" id="exampleModalCenter1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle1" aria-hidden="true">
+			  <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 400px;">
+			    <div class="modal-content">
+			      <div class="modal-header" style="padding: 0">
+			        	<div id="signup-head" id="invoke-signup" onclick="invokeSignup()"><h5 class="modal-title" id="exampleModalLongTitle1">Sign up</h5></div>
+			        	<div id="signin-head" onclick="invokeSignin()"><h5 class="modal-title" id="exampleModalLongTitle1">Sign in</h5></div>
+			        
+			        	 <!--<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-right: 10px"></button>-->
+			      </div>
+			        
+			      <div class="modal-body" id="signup-container">
+			    		<form action="/" method="post" onsubmit="signupData()">
+			    		  <div class="mb-3">
+						    <label for="username" class="form-label">Username</label>
+						    <input type="text" class="form-control" id="username" name="username" aria-describedby="textHelp" required>
+						  </div>
+						  <div class="mb-3">
+						    <label for="email" class="form-label">Email address</label>
+						    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
+						    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+						  </div>
+						  <div class="mb-3">
+						    <label for="password" class="form-label">Password</label>
+						    <input type="password" class="form-control" id="password" name="password" required>
+						  </div>
+						  <button type="submit" class="btn" style="background-color: #284E78;color: white">SIGN UP</button>
+						  <button class="btn btn-secondary" style="position: absolute;right: 10px" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+						</form>				   	   				
+			      </div>
+			       <div class="modal-body" id="signin-container">
+			    		<form action="/" method="post" onsubmit="signupData()">
+			    		  <!--<div class="mb-3">
+						    <label for="username" class="form-label">Username</label>
+						    <input type="text" class="form-control" id="username" name="username" aria-describedby="textHelp" required>
+						  </div>-->
+						  <div class="mb-3">
+						    <label for="email" class="form-label">Email address</label>
+						    <input type="email" class="form-control" id="emailIn" name="emailIn" aria-describedby="emailHelp" required>
+						    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+						  </div>
+						  <div class="mb-3">
+						    <label for="password" class="form-label">Password</label>
+						    <input type="password" class="form-control" id="passwordIn" name="passwordIn" required>
+						  </div>
+
+						  <div class="mb-3 form-check">
+						    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+						    <label class="form-check-label" for="exampleCheck1">Remember me</label>
+						  </div>
+						  <button type="submit" class="btn" style="background-color: #5D8233;color: white">SIGN IN</button>
+						  <button class="btn btn-secondary" style="position: absolute;right: 10px" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+					    </form>				   	   				
+			      </div>
+			    </div>
+			   </div>
+		</div>
+
+
+	</div>
+	<div class="col-6">
+		<img src="image1.gif" id="image_gif">
+	</div>
+</div>
+</div>
+<script type="text/javascript">
+	const nLink = "<%= link %>"; 
+	document.getElementById("newLink").value = nLink;
+
+	const user = "<%= userName %>";
+	console.log(user);
+	if(user !== "sample")
+	{
+		document.getElementById("check").style.display = 'none';
+		$("#profile").show();
+	}
+	else
+	{
+		$("#profile").css("display","none");
+		$("#check").show();
+	}
+
+
+	function create()
+	{
+	    const user = '<%= userName %>';
+	    console.log("inside create : "+user);
+	    if(user !== "sample")
+	    {
+	       document.getElementById("create").setAttribute("data-target","#exampleModalCenter"); 
+	       $("#exampleModalCenter").modal("show");
+	    }
+	    else
+	    {
+	        document.getElementById("create").setAttribute("data-target", "#exampleModalCenter1");
+	        $("#exampleModalCenter1").modal("show");
+	    }
+	};
+</script>
+</body>
+</html>
